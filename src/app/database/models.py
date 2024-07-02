@@ -1,5 +1,5 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, Text, Enum
-from app.database import Base
+from sqlalchemy import Column, Integer, String, Text
+from app.database.config import Base
 
 
 class Memes(Base):

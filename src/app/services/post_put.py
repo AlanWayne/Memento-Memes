@@ -1,4 +1,4 @@
-from app.models import Memes
+from app.database.models import Memes
 from sqlalchemy.orm import Session
 from fastapi import HTTPException, UploadFile
 from uuid import uuid4
