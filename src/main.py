@@ -2,7 +2,8 @@ import uvicorn
 from fastapi import FastAPI
 from app.routers import memes, util
 
-app = FastAPI()
+
+app = FastAPI(title="Memento Memes")
 app.include_router(memes.router, prefix="")
 app.include_router(util.router, prefix="")
 

@@ -1,6 +1,6 @@
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
-from sqlalchemy.orm import declarative_base
 from dotenv import load_dotenv
+from sqlalchemy.orm import declarative_base
 import os
 
 load_dotenv()
@@ -13,9 +13,9 @@ DB_USER = os.environ.get("DB_USER")
 DB_PASS = os.environ.get("DB_PASS")
 
 url = f"{DB_DRIV}+asyncpg://{DB_USER}:{DB_PASS}@{DB_HOST}/{DB_NAME}"
+Base = declarative_base()
 engine = create_async_engine(url, echo=True)
 SessionLocal = async_sessionmaker(engine, expire_on_commit=False, class_=AsyncSession)
-Base = declarative_base()
 
 
 async def get_db() -> AsyncSession:
@@ -24,5 +24,8 @@ async def get_db() -> AsyncSession:
     db = SessionLocal()
     try:
         yield db
+    except Exception as e:
+        await db.rollback()
+        raise e
     finally:
         await db.close()

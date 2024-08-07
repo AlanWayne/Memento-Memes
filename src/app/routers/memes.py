@@ -10,12 +10,23 @@ router = APIRouter()
 async def get_memes_all_url(
         page: int = 1, limit: int = 50, db: AsyncSession = Depends(get_db)
 ):
+    """
+    Get information about all memes
+
+    - **page**: go to the page number <page>
+    - **limit**: amount of memes on page
+    """
     return await get.get_memes_all(page=page, limit=limit, db=db)
 
 
 #
 @router.get("/memes/{id}", tags=["GET"])
 async def get_memed_by_id_url(get_id: int = None, db: AsyncSession = Depends(get_db)):
+    """
+    Get information about spesific meme
+
+    - **id**: specify id of the desired meme
+    """
     return await get.get_memes_by_id(get_id=get_id, db=db)
 
 
@@ -23,6 +34,12 @@ async def get_memed_by_id_url(get_id: int = None, db: AsyncSession = Depends(get
 async def post_memes_url(
         file: UploadFile = File(...), text: str = Body(...), db: AsyncSession = Depends(get_db)
 ):
+    """
+    Add new meme to the base
+
+    - **file**: upload your image
+    - **text**: meme description
+    """
     return await post_put.post_memes(file=file, text=text, db=db)
 
 
@@ -33,9 +50,21 @@ async def update_memes_url(
         text: str = Body(None),
         db: AsyncSession = Depends(get_db),
 ):
+    """
+    Change specific meme in the base
+
+    - **id**: specify id of the desired meme
+    - **file**: upload new image
+    - **text**: set new meme description
+    """
     return await post_put.update_memes(upd_id=upd_id, file=file, text=text, db=db)
 
 
 @router.delete("/memes/{id}", tags=["DELETE"])
 async def delete_by_id_url(del_id: int, db: AsyncSession = Depends(get_db)):
+    """
+    Remove specific meme from the base
+
+    - **id**: specify id of the meme to remove
+    """
     return await delete.delete_by_id(del_id=del_id, db=db)
