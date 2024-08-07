@@ -1,11 +1,13 @@
 from app.database.models import Memes
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select
 from fastapi import HTTPException, UploadFile
 from uuid import uuid4
 from pathlib import Path
+from os import remove
 
 
-def post_memes(file: UploadFile, text: str, db: AsyncSession):
+async def post_memes(file: UploadFile, text: str, db: AsyncSession):
     if file.size < 1:
         raise HTTPException(status_code=422, detail=f"The file is too small")
 
@@ -27,7 +29,7 @@ def post_memes(file: UploadFile, text: str, db: AsyncSession):
     try:
         item = Memes(text=text, path=path)
         db.add(item)
-        db.commit()
+        await db.commit()
 
         return {
             "id": item.id,
@@ -39,21 +41,42 @@ def post_memes(file: UploadFile, text: str, db: AsyncSession):
         raise HTTPException(status_code=500, detail=f"Database error: {e}")
 
 
-def update_memes(upd_id: int, file: UploadFile, text: str, db: AsyncSession):
+async def update_memes(upd_id: int, file: UploadFile, text: str, db: AsyncSession):
     try:
-        item = db.query(Memes).filter(Memes.id == upd_id).first()
+        query = select(Memes).where(Memes.id == upd_id)
+        result = await db.execute(query)
+        item = result.scalars().first()
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"No item with id {upd_id}: {e}")
 
     try:
         if file:
-            item.file = file
+            try:
+                remove(item.path)
+            except Exception as e:
+                raise HTTPException(status_code=500, detail=str(e))
+
+            try:
+                Path("app/media").mkdir(parents=True, exist_ok=True)
+                path = f"app/media/{uuid4()}.{file.filename.split('.')[-1]}"
+                item.path = path
+
+            except Exception as e:
+                raise HTTPException(status_code=500, detail=f"Path resolution error: {e}")
+
+            try:
+                with open(path, "wb") as write_file:
+                    file.file.seek(0)
+                    write_file.write(file.file.read())
+
+            except Exception as e:
+                raise HTTPException(status_code=500, detail=f"File writing error: {e}")
 
         if text:
             item.text = text
 
-        db.commit()
+        await db.commit()
 
         response = {
             "id": item.id,

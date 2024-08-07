@@ -70,4 +70,3 @@ async def fill_with_data(amount: int, db: AsyncSession):
     await db.commit()
 
     return f"Items created: {responses}"
-
