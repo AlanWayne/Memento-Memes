@@ -4,18 +4,20 @@ from main import app
 from dotenv import load_dotenv
 from app.database.config import get_db
 from pytest import fixture
-import os
 from typing import AsyncGenerator
-from httpx import AsyncClient
+from httpx import AsyncClient, ASGITransport
+from os import environ
+from asyncio import get_event_loop_policy
+
 
 load_dotenv()
 
-DB_DRIV_TEST = os.environ.get("DB_DRIV_TEST")
-DB_HOST_TEST = os.environ.get("DB_HOST_TEST")
-DB_PORT_TEST = os.environ.get("DB_PORT_TEST")
-DB_NAME_TEST = os.environ.get("DB_NAME_TEST")
-DB_USER_TEST = os.environ.get("DB_USER_TEST")
-DB_PASS_TEST = os.environ.get("DB_PASS_TEST")
+DB_DRIV_TEST = environ.get("DB_DRIV_TEST")
+DB_HOST_TEST = environ.get("DB_HOST_TEST")
+DB_PORT_TEST = environ.get("DB_PORT_TEST")
+DB_NAME_TEST = environ.get("DB_NAME_TEST")
+DB_USER_TEST = environ.get("DB_USER_TEST")
+DB_PASS_TEST = environ.get("DB_PASS_TEST")
 
 url = f"{DB_DRIV_TEST}+asyncpg://{DB_USER_TEST}:{DB_PASS_TEST}@{DB_HOST_TEST}/{DB_NAME_TEST}"
 Base = declarative_base()
@@ -34,8 +36,15 @@ async def setup_db():
 
 @fixture(scope='session')
 async def async_client() -> AsyncGenerator[AsyncClient, None]:
-    async with AsyncClient(app=app, base_url="http://test") as aclient:
-        yield aclient
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as async_client:
+        yield async_client
+
+
+@fixture(scope='session')
+async def event_loop(request):
+    loop = get_event_loop_policy().new_event_loop()
+    yield loop
+    loop.close()
 
 
 async def override_get_db() -> AsyncSession:
