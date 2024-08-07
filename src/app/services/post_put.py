@@ -1,15 +1,16 @@
 from app.database.models import Memes
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import HTTPException, UploadFile
 from uuid import uuid4
+from pathlib import Path
 
 
-def post_memes(file: UploadFile, text: str, db: Session):
-
+def post_memes(file: UploadFile, text: str, db: AsyncSession):
     if file.size < 1:
         raise HTTPException(status_code=422, detail=f"The file is too small")
 
     try:
+        Path("app/media").mkdir(parents=True, exist_ok=True)
         path = f"app/media/{uuid4()}.{file.filename.split('.')[-1]}"
 
     except Exception as e:
@@ -38,13 +39,12 @@ def post_memes(file: UploadFile, text: str, db: Session):
         raise HTTPException(status_code=500, detail=f"Database error: {e}")
 
 
-def update_memes(id: int, file: UploadFile, text: str, db: Session):
-
+def update_memes(upd_id: int, file: UploadFile, text: str, db: AsyncSession):
     try:
-        item = db.query(Memes).filter(Memes.id == id).first()
+        item = db.query(Memes).filter(Memes.id == upd_id).first()
 
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"No item with id {id}: {e}")
+        raise HTTPException(status_code=500, detail=f"No item with id {upd_id}: {e}")
 
     try:
         if file:

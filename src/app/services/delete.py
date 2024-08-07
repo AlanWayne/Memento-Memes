@@ -1,18 +1,19 @@
 from app.database.models import Memes
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select
 from fastapi import HTTPException
 from os import remove
 
 
-def delete_by_id(id: int, db: Session):
-
+async def delete_by_id(del_id: int, db: AsyncSession):
     try:
-        item = db.query(Memes).filter(Memes.id == id).first()
+        result = await db.execute(select(Memes).where(Memes.id == del_id))
+        item = result.scalars().first()
 
         try:
             remove(item.path)
-        except:
-            pass
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=str(e))
 
         response = {
             "id": item.id,
@@ -20,8 +21,8 @@ def delete_by_id(id: int, db: Session):
             "path": item.path,
         }
 
-        db.delete(item)
-        db.commit()
+        await db.delete(item)
+        await db.commit()
 
         return f"Deleted: {response}"
 

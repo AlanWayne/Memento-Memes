@@ -1,19 +1,20 @@
 from app.database.models import Memes
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select
 from fastapi import HTTPException
+import asyncio
 
 
-def get_memes_all(page: int, limit: int, db: Session):
-
-    page -= 1
+async def get_memes_all(page: int, limit: int, db: AsyncSession):
+    page = page - 1 if page >= 0 else 1
+    limit = limit if limit > 0 else 50
 
     try:
-        if limit > 0 and page >= 0:
-            response = (
-                db.query(Memes).offset(offset=page * limit).limit(limit=limit).all()
-            )
-        else:
-            response = db.query(Memes).all()
+        query = select(Memes).offset(offset=page * limit).limit(limit=limit)
+        result = await db.execute(query)
+        response = (
+            result.scalars().all()
+        )
 
         return response
 
@@ -21,10 +22,9 @@ def get_memes_all(page: int, limit: int, db: Session):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-def get_memes_by_id(id: int, db: Session):
-
+def get_memes_by_id(get_id: int, db: AsyncSession):
     try:
-        response = db.query(Memes).filter(Memes.id == id).first()
+        response = db.query(Memes).filter(Memes.id == get_id).first()
 
         return response
 
