@@ -2,7 +2,6 @@ from app.database.models import Memes
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from fastapi import HTTPException
-import asyncio
 
 
 async def get_memes_all(page: int, limit: int, db: AsyncSession):
@@ -10,16 +9,20 @@ async def get_memes_all(page: int, limit: int, db: AsyncSession):
     limit = limit if limit > 0 else 50
 
     try:
+        print("LOG: Init")
         query = select(Memes).offset(offset=page * limit).limit(limit=limit)
+        print("LOG: Query set")
         result = await db.execute(query)
+        print("LOG: Query executed")
         response = (
             result.scalars().all()
         )
+        print("LOG: Got result")
 
         return response
 
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=str(f"No connection to database {e}"))
 
 
 async def get_memes_by_id(get_id: int, db: AsyncSession):

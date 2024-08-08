@@ -18,7 +18,7 @@ DB_NAME_TEST = environ.get("DB_NAME_TEST")
 DB_USER_TEST = environ.get("DB_USER_TEST")
 DB_PASS_TEST = environ.get("DB_PASS_TEST")
 
-url = f"{DB_DRIV_TEST}+asyncpg://{DB_USER_TEST}:{DB_PASS_TEST}@{DB_HOST_TEST}/{DB_NAME_TEST}"
+url = f"{DB_DRIV_TEST}+asyncpg://{DB_USER_TEST}:{DB_PASS_TEST}@{DB_HOST_TEST}:{DB_PORT_TEST}/{DB_NAME_TEST}"
 Base = declarative_base()
 engine = create_async_engine(url, echo=True, poolclass=NullPool)
 SessionLocal = async_sessionmaker(engine, expire_on_commit=False, class_=AsyncSession)
