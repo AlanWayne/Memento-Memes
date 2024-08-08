@@ -7,7 +7,6 @@ from app.database.config import get_db
 from typing import AsyncGenerator
 from httpx import AsyncClient, ASGITransport
 from os import environ
-import asyncio
 import pytest
 
 load_dotenv()

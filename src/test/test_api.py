@@ -1,5 +1,4 @@
 from httpx import AsyncClient
-import pytest
 
 
 async def test_post(async_client: AsyncClient):
@@ -59,4 +58,3 @@ async def test_del(async_client: AsyncClient):
     response = await async_client.get(f"/memes/{del_id}")
 
     assert response.json()['status_code'] == 500
-
