@@ -20,7 +20,7 @@ async def get_memes_all_url(
 
 
 #
-@router.get("/memes/{id}", tags=["GET"])
+@router.get("/memes/{get_id}", tags=["GET"])
 async def get_memed_by_id_url(get_id: int = None, db: AsyncSession = Depends(get_db)):
     """
     Get information about spesific meme
@@ -43,7 +43,7 @@ async def post_memes_url(
     return await post_put.post_memes(file=file, text=text, db=db)
 
 
-@router.put("/memes/{id}", tags=["POST/PUT"])
+@router.put("/memes/{upd_id}", tags=["POST/PUT"])
 async def update_memes_url(
         upd_id: int = None,
         file: UploadFile = File(None),
@@ -60,7 +60,7 @@ async def update_memes_url(
     return await post_put.update_memes(upd_id=upd_id, file=file, text=text, db=db)
 
 
-@router.delete("/memes/{id}", tags=["DELETE"])
+@router.delete("/memes/{del_id}", tags=["DELETE"])
 async def delete_by_id_url(del_id: int, db: AsyncSession = Depends(get_db)):
     """
     Remove specific meme from the base

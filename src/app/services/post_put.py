@@ -84,7 +84,7 @@ async def update_memes(upd_id: int, file: UploadFile, text: str, db: AsyncSessio
             "path": item.path,
         }
 
-        return f"Updated: {response}"
+        return response
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"{e}")

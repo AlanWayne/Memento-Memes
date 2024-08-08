@@ -28,6 +28,8 @@ async def get_memes_by_id(get_id: int, db: AsyncSession):
         query = select(Memes).where(Memes.id == get_id)
         result = await db.execute(query)
         response = result.scalars().first()
+        if response is None:
+            return HTTPException(status_code=500, detail="No record with such id")
         return response
 
     except Exception as e:
