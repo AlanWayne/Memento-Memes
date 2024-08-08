@@ -1,7 +1,8 @@
-from app.database.models import Memes
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
 from fastapi import HTTPException
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.database.models import Memes
 
 
 async def get_memes_all(page: int, limit: int, db: AsyncSession):

@@ -1,10 +1,12 @@
-from app.database.models import Memes
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
-from fastapi import HTTPException, UploadFile
-from uuid import uuid4
-from pathlib import Path
 from os import remove
+from pathlib import Path
+from uuid import uuid4
+
+from fastapi import HTTPException, UploadFile
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.database.models import Memes
 
 
 async def post_memes(file: UploadFile, text: str, db: AsyncSession):

@@ -1,9 +1,19 @@
+from contextlib import asynccontextmanager
+
 import uvicorn
 from fastapi import FastAPI
+
+from app.database.config import init_models
 from app.routers import memes, util
 
 
-app = FastAPI(title="Memento Memes")
+@asynccontextmanager
+async def lifespan(lifespan_app: FastAPI):
+    await init_models()
+    yield
+
+
+app = FastAPI(title="Memento Memes", lifespan=lifespan)
 app.include_router(memes.router, prefix="")
 app.include_router(util.router, prefix="")
 

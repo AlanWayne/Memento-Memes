@@ -1,13 +1,15 @@
+from os import environ
+from typing import AsyncGenerator
+
+import pytest
+from dotenv import load_dotenv
+from httpx import AsyncClient, ASGITransport
 from sqlalchemy import NullPool
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
 from sqlalchemy.orm import declarative_base
-from main import app
-from dotenv import load_dotenv
+
 from app.database.config import get_db
-from typing import AsyncGenerator
-from httpx import AsyncClient, ASGITransport
-from os import environ
-import pytest
+from main import app
 
 load_dotenv()
 
@@ -45,7 +47,6 @@ async def setup_db():
 async def async_client() -> AsyncGenerator[AsyncClient, None]:
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as async_client:
         yield async_client
-
 
 # async def override_get_db() -> AsyncSession:
 #     async with engine.begin() as connection:

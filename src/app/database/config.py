@@ -1,10 +1,10 @@
-from sqlalchemy import NullPool
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
-from dotenv import load_dotenv
-from sqlalchemy.orm import declarative_base
 import os
 from typing import AsyncGenerator
-import asyncio
+
+from dotenv import load_dotenv
+from sqlalchemy import NullPool
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
+from sqlalchemy.orm import declarative_base
 
 load_dotenv()
 
@@ -26,6 +26,11 @@ async def get_db() -> AsyncGenerator[AsyncSession, None]:
     async with SessionLocal() as db:
         yield db
 
+
+async def init_models():
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.drop_all)
+        await conn.run_sync(Base.metadata.create_all)
 
 # async def get_db() -> AsyncSession:
 #     async with engine.begin() as connection:

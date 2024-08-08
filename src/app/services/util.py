@@ -1,11 +1,13 @@
-from app.database.models import Memes
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, delete
-from fastapi import HTTPException
-from uuid import uuid4
 from os import remove
-import requests
 from pathlib import Path
+from uuid import uuid4
+
+import requests
+from fastapi import HTTPException
+from sqlalchemy import select, delete
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.database.models import Memes
 
 
 async def delete_all(db: AsyncSession):

@@ -1,6 +1,7 @@
-from sqlalchemy import Column, Integer, String, Text
-from app.database.config import Base
 from pydantic import BaseModel
+from sqlalchemy import Column, Integer, String, Text
+
+from app.database.config import Base
 
 
 class Memes(Base):
@@ -15,3 +16,5 @@ class MemesBase(BaseModel):
     id: int
     text: str
     path: str
+
+# asyncio.run(init_models())

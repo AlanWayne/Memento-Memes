@@ -1,8 +1,10 @@
-from app.database.models import Memes
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
-from fastapi import HTTPException
 from os import remove
+
+from fastapi import HTTPException
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.database.models import Memes
 
 
 async def delete_by_id(del_id: int, db: AsyncSession):
