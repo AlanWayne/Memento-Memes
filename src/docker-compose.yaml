@@ -1,15 +1,19 @@
 services:
   db:
     image: postgres:13
-    ports:
-      - "5431:5431"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+#    ports:
+#      - "${DB_VP}:${DB_VP}"
     environment:
       - POSTGRES_DB=${DB_NAME}
       - POSTGRES_USER=${DB_USER}
       - POSTGRES_PASSWORD=${DB_PASS}
-    command: postgres -c port=5431
+    command: postgres -c port=${DB_VP}
+    networks:
+      - my-network
     healthcheck:
-      test: pg_isready -h ${DB_HOST} -p 5431 -d ${DB_NAME} -U ${DB_USER}
+      test: pg_isready -h ${DB_HOST} -p ${DB_VP} -d ${DB_NAME} -U ${DB_USER}
       interval: 1s
       timeout: 3s
       retries: 20
@@ -20,11 +24,20 @@ services:
       - "8000:8000"
     environment:
       - DB_DRIV=${DB_DRIV}
-      - DB_HOST=${DB_HOST}
-      - DB_PORT=5431
+      - DB_HOST=db
+      - DB_PORT=${DB_VP}
       - DB_NAME=${DB_NAME}
       - DB_USER=${DB_USER}
       - DB_PASS=${DB_PASS}
+    networks:
+      - my-network
     depends_on:
       db:
         condition: service_healthy
+
+networks:
+  my-network:
+
+
+volumes:
+  db-data:

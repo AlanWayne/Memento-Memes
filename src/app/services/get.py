@@ -10,7 +10,7 @@ async def get_memes_all(page: int, limit: int, db: AsyncSession):
     limit = limit if limit > 0 else 50
 
     try:
-        print("LOG: Init")
+        print(f"LOG: Init: {db.bind.url}")
         query = select(Memes).offset(offset=page * limit).limit(limit=limit)
         print("LOG: Query set")
         result = await db.execute(query)
