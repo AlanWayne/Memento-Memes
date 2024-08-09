@@ -6,9 +6,8 @@ from dotenv import load_dotenv
 from httpx import AsyncClient, ASGITransport
 from sqlalchemy import NullPool
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
-from sqlalchemy.orm import declarative_base
-from app.database.models import Memes
-from app.database.config import get_db
+
+from app.database.config import get_db, Base
 from main import app
 
 load_dotenv()
@@ -16,12 +15,11 @@ load_dotenv()
 DB_DRIV = environ.get("DB_DRIV")
 DB_HOST = environ.get("DB_HOST")
 DB_PORT = environ.get("DB_PORT")
-DB_NAME = environ.get("DB_NAME")
+DB_NAME_TEST = environ.get("DB_NAME_TEST")
 DB_USER = environ.get("DB_USER")
 DB_PASS = environ.get("DB_PASS")
 
-url = f"{DB_DRIV}+asyncpg://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
-Base = declarative_base()
+url = f"{DB_DRIV}+asyncpg://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME_TEST}"
 engine = create_async_engine(url, echo=True, poolclass=NullPool)
 SessionLocal = async_sessionmaker(engine, expire_on_commit=False, class_=AsyncSession)
 

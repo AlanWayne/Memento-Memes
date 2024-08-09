@@ -1,6 +1,8 @@
 from contextlib import asynccontextmanager
+
 import uvicorn
 from fastapi import FastAPI
+
 from app.database.config import init_models, drop_model
 from app.routers import memes, util
 

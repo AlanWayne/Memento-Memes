@@ -1,7 +1,8 @@
 from os import environ
+from pathlib import Path
 from shutil import rmtree
 from typing import AsyncGenerator
-from pathlib import Path
+
 from dotenv import load_dotenv
 from sqlalchemy import NullPool
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
@@ -44,7 +45,6 @@ async def drop_model():
         await conn.run_sync(Base.metadata.drop_all)
         rmtree("app/media/")
         Path("app/media").mkdir(parents=True, exist_ok=True)
-
 
 # async def get_db() -> AsyncSession:
 #     async with engine.begin() as connection:
