@@ -1,15 +1,11 @@
 services:
   db:
     image: postgres:13
-    volumes:
-      - db-data:/var/lib/postgresql/data
     environment:
       - POSTGRES_DB=${DB_NAME}
       - POSTGRES_USER=${DB_USER}
       - POSTGRES_PASSWORD=${DB_PASS}
     command: postgres -c port=${DB_VP}
-    networks:
-      - my-network
     healthcheck:
       test: pg_isready -h ${DB_HOST} -p ${DB_VP} -d ${DB_NAME} -U ${DB_USER}
       interval: 1s
@@ -27,15 +23,6 @@ services:
       - DB_NAME=${DB_NAME}
       - DB_USER=${DB_USER}
       - DB_PASS=${DB_PASS}
-    networks:
-      - my-network
     depends_on:
       db:
         condition: service_healthy
-
-networks:
-  my-network:
-
-
-volumes:
-  db-data:
