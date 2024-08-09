@@ -3,7 +3,7 @@ from contextlib import asynccontextmanager
 import uvicorn
 from fastapi import FastAPI
 
-from app.database.config import init_models
+from app.database.config import init_models, drop_model
 from app.routers import memes, util
 
 
@@ -11,6 +11,7 @@ from app.routers import memes, util
 async def lifespan(lifespan_app: FastAPI):
     await init_models()
     yield
+    await drop_model()
 
 
 app = FastAPI(title="Memento Memes", lifespan=lifespan)

@@ -12,9 +12,9 @@ class Memes(Base):
     path = Column(String, unique=True, default="")
 
 
-class MemesBase(BaseModel):
-    id: int
-    text: str
-    path: str
+# class MemesBase(BaseModel):
+#     id: int
+#     text: str
+#     path: str
 
 # asyncio.run(init_models())

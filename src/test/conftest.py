@@ -7,20 +7,20 @@ from httpx import AsyncClient, ASGITransport
 from sqlalchemy import NullPool
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
 from sqlalchemy.orm import declarative_base
-
+from app.database.models import Memes
 from app.database.config import get_db
 from main import app
 
 load_dotenv()
 
-DB_DRIV_TEST = environ.get("DB_DRIV_TEST")
-DB_HOST_TEST = environ.get("DB_HOST_TEST")
-DB_PORT_TEST = environ.get("DB_PORT_TEST")
-DB_NAME_TEST = environ.get("DB_NAME_TEST")
-DB_USER_TEST = environ.get("DB_USER_TEST")
-DB_PASS_TEST = environ.get("DB_PASS_TEST")
+DB_DRIV = environ.get("DB_DRIV")
+DB_HOST = environ.get("DB_HOST")
+DB_PORT = environ.get("DB_PORT")
+DB_NAME = environ.get("DB_NAME")
+DB_USER = environ.get("DB_USER")
+DB_PASS = environ.get("DB_PASS")
 
-url = f"{DB_DRIV_TEST}+asyncpg://{DB_USER_TEST}:{DB_PASS_TEST}@{DB_HOST_TEST}:{DB_PORT_TEST}/{DB_NAME_TEST}"
+url = f"{DB_DRIV}+asyncpg://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 Base = declarative_base()
 engine = create_async_engine(url, echo=True, poolclass=NullPool)
 SessionLocal = async_sessionmaker(engine, expire_on_commit=False, class_=AsyncSession)
