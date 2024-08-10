@@ -45,15 +45,3 @@ async def drop_model():
         await conn.run_sync(Base.metadata.drop_all)
         rmtree("app/media/")
         Path("app/media").mkdir(parents=True, exist_ok=True)
-
-# async def get_db() -> AsyncSession:
-#     async with engine.begin() as connection:
-#         await connection.run_sync(Base.metadata.create_all)
-#     db = SessionLocal()
-#     try:
-#         yield db
-#     except Exception as e:
-#         await db.rollback()
-#         raise e
-#     finally:
-#         await db.close()

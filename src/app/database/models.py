@@ -9,10 +9,3 @@ class Memes(Base):
     id = Column(Integer, primary_key=True)
     text = Column(Text, default="")
     path = Column(String, unique=True, default="")
-
-# class MemesBase(BaseModel):
-#     id: int
-#     text: str
-#     path: str
-
-# asyncio.run(init_models())
