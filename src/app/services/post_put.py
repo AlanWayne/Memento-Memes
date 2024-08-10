@@ -7,6 +7,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database.models import Memes
+from app.services.s3 import upload_file
 
 
 async def post_memes(file: UploadFile, text: str, db: AsyncSession):
@@ -14,19 +15,11 @@ async def post_memes(file: UploadFile, text: str, db: AsyncSession):
         raise HTTPException(status_code=422, detail=f"The file is too small")
 
     try:
-        Path("app/media").mkdir(parents=True, exist_ok=True)
-        path = f"app/media/{uuid4()}.{file.filename.split('.')[-1]}"
+        filename = f"{uuid4()}"
+        path = await upload_file(filename=filename, file=file)
 
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Path resolution error: {e}")
-
-    try:
-        with open(path, "wb") as write_file:
-            file.file.seek(0)
-            write_file.write(file.file.read())
-
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"File writing error: {e}")
+        raise HTTPException(status_code=500, detail=f"File upload error: {e}")
 
     try:
         item = Memes(text=text, path=path)
@@ -55,25 +48,11 @@ async def update_memes(upd_id: int, file: UploadFile, text: str, db: AsyncSessio
     try:
         if file:
             try:
-                remove(item.path)
-            except Exception as e:
-                raise HTTPException(status_code=500, detail=str(e))
-
-            try:
-                Path("app/media").mkdir(parents=True, exist_ok=True)
-                path = f"app/media/{uuid4()}.{file.filename.split('.')[-1]}"
-                item.path = path
+                filename = item.path.split("/")[-1]
+                item.path = await upload_file(filename=filename, file=file)
 
             except Exception as e:
-                raise HTTPException(status_code=500, detail=f"Path resolution error: {e}")
-
-            try:
-                with open(path, "wb") as write_file:
-                    file.file.seek(0)
-                    write_file.write(file.file.read())
-
-            except Exception as e:
-                raise HTTPException(status_code=500, detail=f"File writing error: {e}")
+                raise HTTPException(status_code=500, detail=f"File upload error: {e}")
 
         if text:
             item.text = text

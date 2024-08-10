@@ -5,6 +5,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database.models import Memes
+from app.services.s3 import delete_file
 
 
 async def delete_by_id(del_id: int, db: AsyncSession):
@@ -13,7 +14,8 @@ async def delete_by_id(del_id: int, db: AsyncSession):
         item = result.scalars().first()
 
         try:
-            remove(item.path)
+            filename = item.path.split("/")[-1]
+            item.path = await delete_file(filename=filename)
         except Exception as e:
             raise HTTPException(status_code=500, detail=str(e))
 

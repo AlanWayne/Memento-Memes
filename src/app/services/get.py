@@ -16,6 +16,9 @@ async def get_memes_all(page: int, limit: int, db: AsyncSession):
             result.scalars().all()
         )
 
+        if response.__len__() == 0:
+            return "No records in database"
+
         return response
 
     except Exception as e:

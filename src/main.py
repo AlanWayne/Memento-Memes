@@ -11,7 +11,7 @@ from app.routers import memes, util
 async def lifespan(lifespan_app: FastAPI):
     await init_models()
     yield
-    await drop_model()
+    # await drop_model()
 
 
 app = FastAPI(title="Memento Memes", lifespan=lifespan)

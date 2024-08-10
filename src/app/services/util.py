@@ -1,5 +1,4 @@
 from os import remove
-from pathlib import Path
 from uuid import uuid4
 
 import requests
@@ -8,6 +7,7 @@ from sqlalchemy import select, delete
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database.models import Memes
+from app.services.s3 import delete_file, upload_raw
 
 
 async def delete_all(db: AsyncSession):
@@ -18,7 +18,8 @@ async def delete_all(db: AsyncSession):
 
         for item in items:
             try:
-                remove(item.path)
+                filename = item.path.split("/")[-1]
+                item.path = await delete_file(filename=filename)
             except Exception as e:
                 raise HTTPException(status_code=500, detail=f"No item found: {e}")
 
@@ -33,29 +34,29 @@ async def delete_all(db: AsyncSession):
 
 
 async def fill_with_data(amount: int, db: AsyncSession):
-    url = "https://loremflickr.com/640/360"
+    url_img = "https://loremflickr.com/640/360"
+    url_txt = "https://api.api-ninjas.com/v1/loremipsum?max_length=10&random=true"
 
     responses = []
 
     for _ in range(amount):
         try:
-            Path("app/media").mkdir(parents=True, exist_ok=True)
-            uuid = uuid4()
-            path = f"app/media/{uuid}.jpg"
+            with open("app/temp", "wb") as file:
+                response = requests.get(url=url_img)
+                file.write(response.content)
+
+            with open("app/temp", "rb") as file:
+                filename = f"{uuid4()}"
+                path = await upload_raw(filename=filename, file=file)
+
+            remove("app/temp")
 
         except Exception as e:
-            raise HTTPException(status_code=500, detail=f"Path resolution error: {e}")
+            raise HTTPException(status_code=500, detail=f"File upload error: {e}")
 
         try:
-            with open(path, "wb") as write_file:
-                response = requests.get(url=url)
-                write_file.write(response.content)
-
-        except Exception as e:
-            raise HTTPException(status_code=500, detail=f"File writing error: {e}")
-
-        try:
-            item = Memes(text=str(uuid).split("-")[1], path=path)
+            response = requests.get(url=url_txt, headers={'X-Api-Key': 'QsbmNxqn9sx2tKoBXg9maw==H7sVlgW20fSJEYzy'})
+            item = Memes(text=str(response.text), path=path)
             db.add(item)
 
         except Exception as e:
@@ -69,6 +70,10 @@ async def fill_with_data(amount: int, db: AsyncSession):
 
         responses.append(response)
 
-    await db.commit()
+    try:
+        await db.commit()
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Database error: {e}")
 
     return f"Items created: {responses}"
