@@ -20,7 +20,7 @@ DB_PASS = environ.get("DB_PASS")
 url = f"{DB_DRIV}+asyncpg://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 
 Base = declarative_base()
-engine = create_async_engine(url, echo=True, poolclass=NullPool)
+engine = create_async_engine(url, echo=False, poolclass=NullPool)
 SessionLocal = async_sessionmaker(engine, expire_on_commit=False, class_=AsyncSession)
 
 

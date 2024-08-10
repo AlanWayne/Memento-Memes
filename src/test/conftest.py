@@ -1,8 +1,7 @@
-from os import environ
+from os import remove
 from typing import AsyncGenerator
 
 import pytest
-from dotenv import load_dotenv
 from httpx import AsyncClient, ASGITransport
 from sqlalchemy import NullPool
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
@@ -10,16 +9,7 @@ from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sess
 from app.database.config import get_db, Base
 from main import app
 
-load_dotenv()
-
-DB_DRIV = environ.get("DB_DRIV")
-DB_HOST = environ.get("DB_HOST")
-DB_PORT = environ.get("DB_PORT")
-DB_NAME_TEST = environ.get("DB_NAME_TEST")
-DB_USER = environ.get("DB_USER")
-DB_PASS = environ.get("DB_PASS")
-
-url = f"{DB_DRIV}+asyncpg://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME_TEST}"
+url = f"sqlite+aiosqlite:///./test.db"
 engine = create_async_engine(url, echo=True, poolclass=NullPool)
 SessionLocal = async_sessionmaker(engine, expire_on_commit=False, class_=AsyncSession)
 
@@ -39,28 +29,10 @@ async def setup_db():
     yield
     async with engine.begin() as connection:
         await connection.run_sync(Base.metadata.drop_all)
+    remove("test.db")
 
 
 @pytest.fixture(scope='session')
 async def async_client() -> AsyncGenerator[AsyncClient, None]:
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as async_client:
         yield async_client
-
-# async def override_get_db() -> AsyncSession:
-#     async with engine.begin() as connection:
-#         await connection.run_sync(Base.metadata.create_all)
-#     db = SessionLocal()
-#     try:
-#         yield db
-#     except Exception as e:
-#         await db.rollback()
-#         raise e
-#     finally:
-#         await db.close()
-
-
-# @pytest.fixture(scope='session')
-# async def event_loop(request):
-#     loop = asyncio.get_event_loop_policy().new_event_loop()
-#     yield loop
-#     loop.close()
