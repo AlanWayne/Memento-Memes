@@ -1,8 +1,18 @@
 from contextlib import asynccontextmanager
+from os import environ
 from typing import BinaryIO
 
 from aiobotocore.session import get_session
+from dotenv import load_dotenv
 from fastapi import UploadFile
+
+load_dotenv()
+
+ACCESS_KEY = environ.get("ACCESS_KEY")
+SECRET_KEY = environ.get("SECRET_KEY")
+ENDPOINT_URL = environ.get("ENDPOINT_URL")
+BUCKET_NAME = environ.get("BUCKET_NAME")
+STORAGE_URL = environ.get("STORAGE_URL")
 
 
 class S3Client:
@@ -55,7 +65,7 @@ class S3Client:
             filename: str,
     ):
         async with self.get_client() as client:
-            response = await client.delete_object(
+            await client.delete_object(
                 Bucket=self.bucket_name,
                 Key=filename,
             )
@@ -63,35 +73,34 @@ class S3Client:
 
 async def upload_file(filename: str, file: UploadFile):
     s3_client = S3Client(
-        access_key="1b607de15f004053b765358a3cc4be44",
-        secret_key="42b176528a4f4c0b812934501cba94b6",
-        endpoint_url="https://s3.storage.selcloud.ru",
-        bucket_name="memento-memes-1"
+        access_key=f"{ACCESS_KEY}",
+        secret_key=f"{SECRET_KEY}",
+        endpoint_url=f"{ENDPOINT_URL}",
+        bucket_name=f"{BUCKET_NAME}"
     )
 
     await s3_client.upload_file(filename=filename, file=file)
-    return f"https://5290a34f-703f-4fe3-a3d8-3f65685ed326.selstorage.ru/{filename}"
+    return f"{STORAGE_URL}/{filename}"
 
 
 async def upload_raw(filename: str, file: BinaryIO):
     s3_client = S3Client(
-        access_key="1b607de15f004053b765358a3cc4be44",
-        secret_key="42b176528a4f4c0b812934501cba94b6",
-        endpoint_url="https://s3.storage.selcloud.ru",
-        bucket_name="memento-memes-1"
+        access_key=f"{ACCESS_KEY}",
+        secret_key=f"{SECRET_KEY}",
+        endpoint_url=f"{ENDPOINT_URL}",
+        bucket_name=f"{BUCKET_NAME}"
     )
 
     await s3_client.upload_raw(filename=filename, file=file)
-    return f"https://5290a34f-703f-4fe3-a3d8-3f65685ed326.selstorage.ru/{filename}"
+    return f"{STORAGE_URL}/{filename}"
 
 
 async def delete_file(filename: str):
     s3_client = S3Client(
-        access_key="1b607de15f004053b765358a3cc4be44",
-        secret_key="42b176528a4f4c0b812934501cba94b6",
-        endpoint_url="https://s3.storage.selcloud.ru",
-        bucket_name="memento-memes-1"
+        access_key=f"{ACCESS_KEY}",
+        secret_key=f"{SECRET_KEY}",
+        endpoint_url=f"{ENDPOINT_URL}",
+        bucket_name=f"{BUCKET_NAME}"
     )
 
     await s3_client.delete_file(filename=filename)
-
