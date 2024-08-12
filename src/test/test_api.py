@@ -10,7 +10,7 @@ async def test_post(async_client: AsyncClient):
 
     assert response.status_code == 200
     assert response.json()['id'] is not None
-    assert response.json()['path'].startswith('app/media/')
+    assert response.json()['path'].startswith('https://5290a34f-703f-4fe3-a3d8-3f65685ed326.selstorage.ru/')
     assert response.json()['text'] == 'testing post'
 
 
@@ -26,7 +26,7 @@ async def test_put(async_client: AsyncClient):
     print(response.json())
     assert response.status_code == 200
     assert response.json()['id'] == put_id
-    assert response.json()['path'].startswith('app/media/')
+    assert response.json()['path'].startswith('https://5290a34f-703f-4fe3-a3d8-3f65685ed326.selstorage.ru/')
     assert response.json()['text'] == 'testing put'
 
 
@@ -43,7 +43,7 @@ async def test_get(async_client: AsyncClient):
     response = await async_client.get(f"/memes/{get_id}")
 
     assert response.status_code == 200
-    assert response.json()['path'].startswith('app/media/')
+    assert response.json()['path'].startswith('https://5290a34f-703f-4fe3-a3d8-3f65685ed326.selstorage.ru/')
     assert response.json()['text'] == 'testing put'
 
 
